@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swing States und Wahlleute</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .candidate-box {
+            display: inline-block;
+            padding: 15px; /* Größerer Padding für größere Kacheln */
+            margin: 10px;
+            border: 2px solid #ccc;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1.2em; /* Vergrößerte Schriftgröße */
+        }
+        .blue {
+            background-color: blue;
+            color: white;
+        }
+        .red {
+            background-color: red;
+            color: white;
+        }
+        .result {
+            display: none; /* initially hidden */
+            padding: 20px; /* Größerer Padding für größere Kacheln */
+            margin: 10px;
+            border: 1px solid #ccc;
+            width: 250px; /* Breitere Kacheln */
+            text-align: center;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        .highlight-harris {
+            background-color: blue; /* Blaue Kachel für Harris */
+            color: white;
+        }
+        .highlight-trump {
+            background-color: red; /* Rote Kachel für Trump */
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Swing States und Wahlleute</h1>
+    <table>
+        <tr>
+            <th>Bundesstaat</th>
+            <th>Anzahl der Wahlleute</th>
+            <th>Prognose abgeben</th>
+        </tr>
+        <tr id="pennsylvania-row">
+            <td>Pennsylvania</td>
+            <td>19</td>
+            <td>
+                <div class="candidate-box" onclick="makePrediction('harris', 19, 'pennsylvania')">Harris</div>
+                <div class="candidate-box" onclick="makePrediction('trump', 19, 'pennsylvania')">Trump</div>
+            </td>
+        </tr>
+        <tr id="wisconsin-row">
+            <td>Wisconsin</td>
+            <td>10</td>
+            <td>
+                <div class="candidate-box" onclick="makePrediction('harris', 10, 'wisconsin')">Harris</div>
+                <div class="candidate-box" onclick="makePrediction('trump', 10, 'wisconsin')">Trump</div>
+            </td>
+        </tr>
+        <tr id="nevada-row">
+            <td>Nevada</td>
+            <td>6</td>
+            <td>
+                <div class="candidate-box" onclick="makePrediction('harris', 6, 'nevada')">Harris</div>
+                <div class="candidate-box" onclick="makePrediction('trump', 6, 'nevada')">Trump</div>
+            </td>
+        </tr>
+        <tr id="michigan-row">
+            <td>Michigan</td>
+            <td>15</td>
+            <td>
+                <div class="candidate-box" onclick="makePrediction('harris', 15, 'michigan')">Harris</div>
+                <div class="candidate-box" onclick="makePrediction('trump', 15, 'michigan')">Trump</div>
+            </td>
+        </tr>
+        <tr id="northcarolina-row">
+            <td>North Carolina</td>
+            <td>16</td>
+            <td>
+                <div class="candidate-box" onclick="makePrediction('harris', 16, 'northcarolina')">Harris</div>
+                <div class="candidate-box" onclick="makePrediction('trump', 16, 'northcarolina')">Trump</div>
+            </td>
+        </tr>
+        <tr id="georgia-row">
+            <td>Georgia</td>
+            <td>16</td>
+            <td>
+                <div class="candidate-box" onclick="makePrediction('harris', 16, 'georgia')">Harris</div>
+                <div class="candidate-box" onclick="makePrediction('trump', 16, 'georgia')">Trump</div>
+            </td>
+        </tr>
+        <tr id="arizona-row">
+            <td>Arizona</td>
+            <td>11</td>
+            <td>
+                <div class="candidate-box" onclick="makePrediction('harris', 11, 'arizona')">Harris</div>
+                <div class="candidate-box" onclick="makePrediction('trump', 11, 'arizona')">Trump</div>
+            </td>
+        </tr>
+    </table>
+
+    <div>
+        <div class="result" id="result-harris">Harris: 226</div>
+        <div class="result" id="result-trump">Trump: 219</div>
+    </div>
+
+    <script>
+        let harrisElectoralVotes = 226; // Startwert für Harris
+        let trumpElectoralVotes = 219; // Startwert für Trump
+        const totalStates = 7; // Anzahl der Bundesstaaten
+        let statesAssigned = 0; // Zähler für zugeordnete Staaten
+        const assignedStates = {}; // Speichert die Zuordnungen
+
+        function makePrediction(candidate, votes, state) {
+            // Wenn der Staat bereits zugeordnet wurde, subtrahiere die Wahlmänner vom vorherigen Kandidaten
+            if (assignedStates[state]) {
+                const previousCandidate = assignedStates[state];
+                if (previousCandidate === 'harris') {
+                    harrisElectoralVotes -= votes;
+                } else {
+                    trumpElectoralVotes -= votes;
+                }
+            }
+
+            // Weise den neuen Kandidaten zu
+            assignedStates[state] = candidate;
+
+            // Färbe die Zeile basierend auf der Wahl des Kandidaten
+            const row = document.getElementById(state + '-row');
+            if (candidate === 'harris') {
+                row.classList.add('blue');
+                row.classList.remove('red');
+                harrisElectoralVotes += votes;
+            } else {
+                row.classList.add('red');
+                row.classList.remove('blue');
+                trumpElectoralVotes += votes;
+            }
+
+            statesAssigned = Object.keys(assignedStates).length;
+            updateResults();
+        }
+
+        function updateResults() {
+            document.getElementById('result-harris').innerText = `Harris: ${harrisElectoralVotes}`;
+            document.getElementById('result-trump').innerText = `Trump: ${trumpElectoralVotes}`;
+
+            // Überprüfe, ob alle Staaten zugeordnet sind
+            if (statesAssigned === totalStates) {
+                document.getElementById('result-harris').style.display = 'inline-block';
+                document.getElementById('result-trump').style.display = 'inline-block';
+            }
+
+            // Highlight den Kandidaten mit mehr als 270 Wahlmännern
+            if (harrisElectoralVotes > 270) {
+                document.getElementById('result-harris').classList.add('highlight-harris');
+                document.getElementById('result-trump').classList.remove('highlight-trump');
+            } else if (trumpElectoralVotes > 270) {
+                document.getElementById('result-trump').classList.add('highlight-trump');
+                document.getElementById('result-harris').classList.remove('highlight-harris');
+            } else {
+                document.getElementById('result-harris').classList.remove('highlight-harris');
+                document.getElementById('result-trump').classList.remove('highlight-trump');
+            }
+        }
+    </script>
+</body>
+</html>
+
+
